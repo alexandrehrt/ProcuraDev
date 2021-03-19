@@ -30,3 +30,8 @@ export const Labels = styled.Text`
   background: lightblue;
   margin: 4px;
 `;
+
+export const Loader = styled.View`
+  margin-top: 10px;
+  align-items: center;
+`;
