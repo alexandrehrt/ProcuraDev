@@ -1,6 +1,18 @@
 import styled from 'styled-components/native';
 import { RectButton } from 'react-native-gesture-handler';
 
+export const FiltersContainer = styled.View`
+  flex-direction: row;
+  background-color: #312e38;
+`;
+
+export const Tag = styled(RectButton)`
+  margin: 20px;
+  padding: 10px;
+  background-color: orange;
+  border-radius: 8px;
+`;
+
 export const Container = styled.SafeAreaView`
     flex: 1;
     background: #312e38;
@@ -9,7 +21,6 @@ export const Container = styled.SafeAreaView`
 
 export const Issue = styled(RectButton)`
   margin: 10px;
-  /* height: 80px; */
   border-radius: 8px;
   background: #fff;
   padding: 10px;

@@ -1,9 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {StatusBar, FlatList, View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {StatusBar, FlatList, Text, View } from 'react-native';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
 
-import { Container, Issue, IssueText, Labels, Loader } from './styles';
+import { 
+  Container, 
+  Issue, 
+  IssueText, 
+  Labels, 
+  FiltersContainer, 
+  Tag } from './styles';
 
 interface Label {
   id: number;
@@ -13,52 +19,61 @@ interface Label {
 interface Issue {
   id: number;
   title: string;
-  labels: Label[];
+  labels: Array<Label>;
   url: string;
   html_url: string;
 }
 
  const App: React.FC = () => {
-   const [page, setPage] = useState(1);
-   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [filteredIssues, setFilteredIssues] = useState();
 
   const getData = async () => {
     const apiURL = `https://api.github.com/repos/frontendbr/vagas/issues?page=${page}&per_page=25`
-    await axios.get(apiURL).then(response => {
-      setIssues(issues.concat(response.data));
-      setIsLoading(false);
-    });
-  };
-
-  const handleLoadMore = () => {
-    setPage(page + 1);
-    setIsLoading(true);
+    await axios.get(apiURL).then(response => setIssues(issues.concat(response.data))).catch(err => console.log(err));
   };
 
   useEffect(() => {
-    setIsLoading(true);
     getData();
   }, [page])
+
+  const handlePress = (level) => {
+    if (level === 'All') {
+      setFilteredIssues('');
+      return;
+    };
+    const filteredList = issues.filter(issue => issue.labels.find(label => label.name === level))
+    setFilteredIssues(filteredList);
+  }
+
+  const renderIssue = ({ item }) => (
+    <Issue onPress={() => Linking.openURL(item.html_url)}>
+      <IssueText>{item.title}</IssueText>
+      {item.labels.map(label => (
+        <Labels key={label.id}>{label.name}</Labels>
+      ))}
+    </Issue>
+  )
 
   return (
     <>
       <StatusBar backgroundColor='#312e38'/>
 
+      <FiltersContainer>
+        <Tag onPress={() => handlePress('All')}><Text>Todos</Text></Tag>
+        <Tag onPress={() => handlePress('Júnior')}><Text>Júnior</Text></Tag>
+        <Tag onPress={() => handlePress('Pleno')}><Text>Pleno</Text></Tag>
+        <Tag onPress={() => handlePress('Sênior')}><Text>Sênior</Text></Tag>
+      </FiltersContainer>
+
       <Container>
         <FlatList
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.9}
-          data={issues}
+          onEndReached={() => setPage(page + 1)}
+          onEndReachedThreshold={0.5}
+          data={filteredIssues ? filteredIssues : issues}
           keyExtractor={issue => issue.html_url}
-          renderItem={({ item: issue }) => (
-            <Issue onPress={() => Linking.openURL(issue.html_url)}>
-              <IssueText>{issue.title}</IssueText>
-              {issue.labels.map(label => (
-                  <Labels key={label.id}>{label.name}</Labels>
-              ))}
-            </Issue>
-          )}
+          renderItem={renderIssue}
         />
       </Container>
     </>
@@ -66,6 +81,3 @@ interface Issue {
 }
 
 export default App;
-
-
-// body?, created_at, id, [labels].name, url, html_url
