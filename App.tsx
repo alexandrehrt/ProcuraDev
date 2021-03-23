@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {StatusBar, FlatList, Text, View } from 'react-native';
+import {StatusBar, FlatList } from 'react-native';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
 
@@ -8,7 +8,9 @@ import {
   Issue, 
   IssueText, 
   Labels, 
-  FiltersContainer, 
+  FiltersContainer,
+  LabelsContainer,
+  LabelText,
   Tag } from './styles';
 
 interface Label {
@@ -27,7 +29,8 @@ interface Issue {
  const App: React.FC = () => {
   const [page, setPage] = useState(1);
   const [issues, setIssues] = useState<Issue[]>([]);
-  const [filteredIssues, setFilteredIssues] = useState();
+  const [filteredIssues, setFilteredIssues] = useState<Issue[] | ''>();
+  const [tagFilter, setTagFilter] = useState('All');
 
   const getData = async () => {
     const apiURL = `https://api.github.com/repos/frontendbr/vagas/issues?page=${page}&per_page=25`
@@ -38,11 +41,11 @@ interface Issue {
     getData();
   }, [page])
 
-  const handlePress = (level) => {
-    if (level === 'All') {
-      setFilteredIssues('');
-      return;
-    };
+  const handlePress = (level:String) => {
+    setTagFilter(level);
+
+    if (level === 'All') return setFilteredIssues('');
+
     const filteredList = issues.filter(issue => issue.labels.find(label => label.name === level))
     setFilteredIssues(filteredList);
   }
@@ -50,21 +53,36 @@ interface Issue {
   const renderIssue = ({ item }) => (
     <Issue onPress={() => Linking.openURL(item.html_url)}>
       <IssueText>{item.title}</IssueText>
-      {item.labels.map(label => (
-        <Labels key={label.id}>{label.name}</Labels>
-      ))}
+      <LabelsContainer>
+        {item.labels.map((label:Label) => (
+          <Labels key={label.id}>{label.name}</Labels>
+        ))}
+      </LabelsContainer>
     </Issue>
   )
+
+  const tagsList = [
+    { name: 'All' },
+    { name: 'Júnior' },
+    { name: 'Pleno' },
+    { name: 'Sênior' },
+  ]
 
   return (
     <>
       <StatusBar backgroundColor='#312e38'/>
 
       <FiltersContainer>
-        <Tag onPress={() => handlePress('All')}><Text>Todos</Text></Tag>
-        <Tag onPress={() => handlePress('Júnior')}><Text>Júnior</Text></Tag>
-        <Tag onPress={() => handlePress('Pleno')}><Text>Pleno</Text></Tag>
-        <Tag onPress={() => handlePress('Sênior')}><Text>Sênior</Text></Tag>
+        {tagsList.map(tag => (
+          <Tag 
+            key={tag.name}
+            backgroundColor={tag.name}
+            // backgroundColor={tag.name === tagFilter ? '#ffa500' : 'lightblue'}
+            onPress={() => handlePress(tag.name)}
+          >
+            <LabelText isActive={tag.name === tagFilter ? '#fff' : '#000'}>{tag.name}</LabelText>
+          </Tag>
+        ))}
       </FiltersContainer>
 
       <Container>
