@@ -1,6 +1,9 @@
 import styled from 'styled-components/native';
 import { RectButton } from 'react-native-gesture-handler';
 
+/*
+FILTERS
+*/
 export const FiltersContainer = styled.View`
   flex-direction: row;
   background-color: #312e38;
@@ -11,8 +14,7 @@ export const FiltersContainer = styled.View`
 export const Tag = styled(RectButton)`
   margin: 20px auto 0;
   padding: 10px;
-  
-  /* background-color: ${props => props.backgroundColor}; */
+  border-radius: 8px;
   background-color: ${props => {
     // TO DO: find out a better way to do this
     if(props.backgroundColor === 'All') return '#66ff00'
@@ -20,13 +22,18 @@ export const Tag = styled(RectButton)`
     if(props.backgroundColor === 'Pleno') return '#00ffff'
     if(props.backgroundColor === 'Sênior') return '#007fff'
   }};
-  border-radius: 8px;
 `;
 
 export const LabelText = styled.Text`
   color: ${props => props.isActive};
 `;
+/*
+FILTERS END
+*/
 
+/*
+LIST
+*/
 export const Container = styled.SafeAreaView`
     flex: 1;
     background: #312e38;
@@ -58,12 +65,24 @@ export const LabelsContainer = styled.View`
 export const Labels = styled.Text`
   padding: 4px;
   border-radius: 8px;
-  color: blue;
-  background: lightblue;
+  color: #000;
   margin: 4px;
+  background-color: ${props => {
+    // TO DO: find out a better way to do this
+    if (props.backgroundColor === 'Júnior') return '#9966cc'
+    if(props.backgroundColor === 'Pleno') return '#00ffff'
+    if(props.backgroundColor === 'Sênior') return '#007fff'
+    if(props.backgroundColor !== 'Júnior' || 'Pleno' || 'Sênior') return 'lightblue'
+  }};
 `;
 
 export const Loader = styled.View`
-  margin-top: 10px;
+  flex: 1;
   align-items: center;
+  justify-content: center;
+`;
+
+export const LoaderText = styled.Text`
+  font-size: 24px;
+  color: #fff;
 `;

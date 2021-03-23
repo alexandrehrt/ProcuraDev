@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {StatusBar, FlatList } from 'react-native';
+import {StatusBar, FlatList, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import * as Linking from 'expo-linking';
 
@@ -11,6 +11,8 @@ import {
   FiltersContainer,
   LabelsContainer,
   LabelText,
+  Loader,
+  LoaderText,
   Tag } from './styles';
 
 interface Label {
@@ -31,10 +33,12 @@ interface Issue {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [filteredIssues, setFilteredIssues] = useState<Issue[] | ''>();
   const [tagFilter, setTagFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
 
   const getData = async () => {
     const apiURL = `https://api.github.com/repos/frontendbr/vagas/issues?page=${page}&per_page=25`
     await axios.get(apiURL).then(response => setIssues(issues.concat(response.data))).catch(err => console.log(err));
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -55,7 +59,7 @@ interface Issue {
       <IssueText>{item.title}</IssueText>
       <LabelsContainer>
         {item.labels.map((label:Label) => (
-          <Labels key={label.id}>{label.name}</Labels>
+          <Labels backgroundColor={label.name} key={label.id}>{label.name}</Labels>
         ))}
       </LabelsContainer>
     </Issue>
@@ -77,7 +81,6 @@ interface Issue {
           <Tag 
             key={tag.name}
             backgroundColor={tag.name}
-            // backgroundColor={tag.name === tagFilter ? '#ffa500' : 'lightblue'}
             onPress={() => handlePress(tag.name)}
           >
             <LabelText isActive={tag.name === tagFilter ? '#fff' : '#000'}>{tag.name}</LabelText>
@@ -86,13 +89,23 @@ interface Issue {
       </FiltersContainer>
 
       <Container>
-        <FlatList
-          onEndReached={() => setPage(page + 1)}
-          onEndReachedThreshold={0.5}
-          data={filteredIssues ? filteredIssues : issues}
-          keyExtractor={issue => issue.html_url}
-          renderItem={renderIssue}
-        />
+        { loading ? 
+          <Loader>
+            <ActivityIndicator size='large' color='#ffa500'/>
+            <LoaderText>Carregando</LoaderText> 
+          </Loader>
+          : 
+          <FlatList
+            onEndReached={() => setPage(page + 1)}
+            onEndReachedThreshold={0.5}
+            data={filteredIssues ? filteredIssues : issues}
+            keyExtractor={issue => issue.html_url}
+            renderItem={renderIssue}
+          />
+        }
+
+
+        
       </Container>
     </>
   );
