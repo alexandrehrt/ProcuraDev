@@ -12,7 +12,10 @@ export const FiltersContainer = styled.View`
 `;
 
 export const Tag = styled(RectButton)`
+  width: 20%;
   margin: 20px auto 0;
+  justify-content: center;
+  align-items: center;
   padding: 10px;
   border-radius: 8px;
   background-color: ${props => {
@@ -80,6 +83,7 @@ export const Loader = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
+  margin-top: 10px;
 `;
 
 export const LoaderText = styled.Text`

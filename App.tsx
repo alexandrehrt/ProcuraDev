@@ -65,6 +65,12 @@ interface Issue {
     </Issue>
   )
 
+  const renderFooter = () => (
+    <Loader>
+      <ActivityIndicator size='large' color='#ffa500'/>
+    </Loader>
+  )
+
   const tagsList = [
     { name: 'All' },
     { name: 'Júnior' },
@@ -101,6 +107,7 @@ interface Issue {
             data={filteredIssues ? filteredIssues : issues}
             keyExtractor={issue => issue.html_url}
             renderItem={renderIssue}
+            ListFooterComponent={renderFooter}
           />
         }
 
